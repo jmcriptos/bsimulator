@@ -4,26 +4,78 @@
     <meta charset="UTF-8">
     <title>Business Simulator - Bienvenido</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        .container {
+            width: 400px;
+            margin: 100px auto;
+            padding: 20px;
+            border: 2px solid #d0d0d0;
+            border-radius: 10px;
+            box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2);
+            background-color: #f0f0f0;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: left;
+        }
+
+        label, input, select, button {
+            margin: 5px 0;
+        }
+
+        input{
+            width: 46%;
+            padding: 8px;
+            border: 1px solid #0078d7;
+            border-radius: 5px;
+        }
+
+        select {
+            width: 50%;
+            padding: 8px;
+            border: 1px solid #0078d7;
+            border-radius: 5px;
+        }
+
+        .button {
+            background-color: #0078d7;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 50%;
+            font-weight: bold;
+            margin-top: 30px;
+        }
+
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            color: #777;
+        }
+    </style>
 </head>
 <body>
-    <h1>Bienvenido al Simulador de Negocios</h1>
-    <form method="POST" action="{{ url_for('index') }}">
-        {{ form.csrf_token }}
-        <label>{{ form.user_id.label }}</label>
-        {{ form.user_id }}
-        <br>
-        <label>{{ form.team.label }}</label>
-        {{ form.team }}
-        <br>
-        {{ form.submit }}
-    </form>
-
-    <div class="footer">
-        <p>BSimulator © 2024</p>
+    <div class="container">
+        <h1 style="text-align: center;">Bienvenido a BSimulator</h1>
+        <form method="POST" action="{{ url_for('index') }}">
+            {{ form.hidden_tag() }}
+            <label for="user_id">{{ form.user_id.label }}</label>
+            {{ form.user_id }}
+            <label for="team">{{ form.team.label }}</label>
+            {{ form.team }}
+            {{ form.submit(class_="button") }}
+        </form>
+        <div class="footer">
+            <p>BSimulator © 2024</p>
+        </div>
     </div>
-
 </body>
 </html>
+
 
 
 

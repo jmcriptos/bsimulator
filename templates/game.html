@@ -5,80 +5,126 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simulador de Negocios - Juego</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
 </head>
 <body>
-    <h1>Simulador de Negocios - Equipo {{ team }}</h1>
-    <p>ID de Usuario: {{ user_id }}</p>
-    
-    <!-- Sección de Decisiones -->
-    <div>
-        <h3>Enviar Decisiones</h3>
-        <form id="decisionForm">
-            <label>Precio:</label>
-            <input type="number" id="price" required><br>
-
-            <label>Marketing:</label>
-            <input type="number" id="marketing" required><br>
-
-            <label>Calidad (1-10):</label>
-            <input type="number" id="quality" min="1" max="10" required><br>
-
-            <label>Producción (unidades):</label>
-            <input type="number" id="production" required><br>
-
-            <label>Innovación:</label>
-            <input type="number" id="innovation" required><br>
-
-            <button type="submit">Enviar</button>
-        </form>
+    <div class="header" style="text-align: center; margin-top: 20px;">
+        <h1 style="font-size: 28px;">BSimulator - {{ team }}</h1>
+        <p>Usuario: {{ user_id }} | {{ team }}</p>
     </div>
 
-    <!-- Sección de Resultados -->
-    <div id="results">
-        <h3>Resultados del Juego</h3>
-        <pre id="resultsOutput"></pre>
+    <!-- Contenedor General del Juego -->
+    <div class="game-container" style="display: flex; justify-content: space-between; margin-top: 40px;">
+        <!-- Sección de Chat -->
+        <div id="chat" style="flex: 1; margin-right: 20px; background-color: #f0f0f0; padding: 20px; border: 2px solid #d0d0d0; border-radius: 5px; box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2);">
+            <h3 style="text-align: center; margin-bottom: 20px;">Chat del Equipo</h3>
+            <div id="chatBox" style="height: 400px; border: 1px solid #cfcfcf; padding: 10px; overflow-y: scroll; background-color: #f9f9f9;"></div>
+            <div style="display: flex; align-items: center; margin-top: 20px;">
+                <input type="text" id="chatMessage" placeholder="Escribe un mensaje..." style="flex: 1; padding: 10px; border-radius: 3px; border: 1px solid #d0d0d0;" onkeydown="if(event.key === 'Enter') sendMessage();">
+                <button type="button" onclick="sendMessage()" style="margin-left: 10px; width: 100px; background-color: #0078d7; color: white; border: none; padding: 10px; border-radius: 3px; cursor: pointer;">Enviar</button>
+            </div>
+        </div>
+
+        <!-- Formulario de Decisiones -->
+        <div id="decisionForm" style="flex: 1; background-color: #f0f0f0; padding: 20px; border: 2px solid #d0d0d0; border-radius: 5px; box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2);">
+            <h3 style="text-align: center; margin-bottom: 20px;">Enviar Decisiones</h3>
+            <form onsubmit="event.preventDefault(); sendDecision();">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <div style="width: 48%;">
+                        <label for="price">Precio:</label>
+                        <input type="number" id="price" name="price" min="0" style="width: 95%; padding: 10px; border-radius: 3px; border: 1px solid #d0d0d0;">
+                    </div>
+                    <div style="width: 48%;">
+                        <label for="marketing">Marketing:</label>
+                        <input type="number" id="marketing" name="marketing" min="0" style="width: 95%; padding: 10px; border-radius: 3px; border: 1px solid #d0d0d0;">
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <div style="width: 48%;">
+                        <label for="quality">Calidad (1-10):</label>
+                        <input type="number" id="quality" name="quality" min="1" max="10" style="width: 95%; padding: 10px; border-radius: 3px; border: 1px solid #d0d0d0;">
+                    </div>
+                    <div style="width: 48%;">
+                        <label for="production">Producción (unidades):</label>
+                        <input type="number" id="production" name="production" min="0" style="width: 95%; padding: 10px; border-radius: 3px; border: 1px solid #d0d0d0;">
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="width: 48%;">
+                        <label for="innovation">Innovación:</label>
+                        <input type="number" id="innovation" name="innovation" min="0" style="width: 95%; padding: 10px; border-radius: 3px; border: 1px solid #d0d0d0;">
+                    </div>
+                    <div style="width: 48%; display: flex; justify-content: center;">
+                        <button type="submit" style="width: 100%; background-color: #0078d7; color: white; border: none; padding: 12px; border-radius: 5px; cursor: pointer; font-weight: bold;">Enviar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
 
-    <!-- Scripts de Socket.IO y lógica de cliente -->
     <script>
-        const socket = io();
+        var socket = io();
+        socket.emit('join', { user_id: '{{ user_id }}', team: '{{ team }}' });
+        console.log('Unido al equipo:', '{{ team }}'); // Para verificar que se une correctamente
 
-        // Enviar decisiones del usuario al servidor
-        document.getElementById('decisionForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+        // Enviar mensaje de chat
+        function sendMessage() {
+            var message = document.getElementById('chatMessage').value;
+            if (message.trim() !== "") {
+                console.log('Sending message:', message);  // Añadir este mensaje de prueba
+                socket.emit('send_message', { user_id: '{{ user_id }}', team: '{{ team }}', message: message });
+                document.getElementById('chatMessage').value = '';
+            }
+        }
 
-            const price = parseFloat(document.getElementById('price').value);
-            const marketing = parseFloat(document.getElementById('marketing').value);
-            const quality = parseInt(document.getElementById('quality').value);
-            const production = parseInt(document.getElementById('production').value);
-            const innovation = parseFloat(document.getElementById('innovation').value);
-
-            // Emitir el evento `send_decision` al servidor con los datos del usuario
-            socket.emit('send_decision', {
-                team: "{{ team }}",
-                price,
-                marketing,
-                quality,
-                production,
-                innovation
-            });
+        // Recibir mensaje de chat
+        socket.on('receive_message', function(data) {
+            var chatBox = document.getElementById('chatBox');
+            var newMessage = document.createElement('p');
+            newMessage.innerHTML = '<strong>' + data.user_id + ':</strong> ' + data.message;
+            chatBox.appendChild(newMessage);
+            chatBox.scrollTop = chatBox.scrollHeight;
         });
 
-        // Escuchar el evento `update_results` para recibir resultados actualizados
-        socket.on('update_results', function(results) {
-            const resultsOutput = document.getElementById('resultsOutput');
-            resultsOutput.innerText = JSON.stringify(results, null, 2);
-        });
+        // Enviar decisiones
+        function sendDecision() {
+            var price = document.getElementById('price').value;
+            var marketing = document.getElementById('marketing').value;
+            var quality = document.getElementById('quality').value;
+            var production = document.getElementById('production').value;
+            var innovation = document.getElementById('innovation').value;
 
-        // Notificación cuando otros usuarios se unen al equipo
-        socket.on('team_notification', function(data) {
-            alert(data.message);
-        });
+            // Validar que todos los campos estén completos
+            if (price && marketing && quality && production && innovation) {
+                // Convertir los valores a números
+                price = parseFloat(price);
+                marketing = parseFloat(marketing);
+                quality = parseFloat(quality);
+                production = parseFloat(production);
+                innovation = parseFloat(innovation);
 
-        // Unirse a la sala del equipo cuando la página se carga
-        socket.emit('join', { user_id: "{{ user_id }}", team: "{{ team }}" });
+                console.log('Sending decision:', { price, marketing, quality, production, innovation });
+                socket.emit('send_decision', {
+                    team: '{{ team }}',
+                    price: price,
+                    marketing: marketing,
+                    quality: quality,
+                    production: production,
+                    innovation: innovation
+                });
+            } else {
+                console.error('Por favor, complete todos los campos antes de enviar la decisión.');
+                alert('Por favor, complete todos los campos antes de enviar la decisión.');
+            }
+        }
+
+        // Recibir confirmación de envío de decisión
+        socket.on('decision_received', function(data) {
+            console.log('Decisión recibida por el servidor:', data);
+        });
     </script>
 </body>
 </html>
+
+
 

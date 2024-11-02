@@ -1,19 +1,24 @@
-from flask import Flask, render_template, session, redirect, url_for
+from flask import Flask
 from flask_wtf import CSRFProtect
-from flask_socketio import SocketIO
 from forms import JoinForm
-import app_routes
+from extensions import socketio  # Importa socketio de extensions
 
 # Configuración de la aplicación Flask
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'  # Cambia esto por una clave secreta segura
-csrf = CSRFProtect(app)  # Inicializar CSRF protection
-socketio = SocketIO(app, async_mode='eventlet', cors_allowed_origins="*")  # Habilitar SocketIO
+app.secret_key = 'a31724589z'  # Usa una clave segura y constante para el desarrollo.
 
-# Registrar las rutas de la aplicación desde app_routes
+# Proteger la aplicación contra CSRF
+csrf = CSRFProtect(app)
+
+# Inicializa socketio con la aplicación Flask
+socketio.init_app(app, async_mode='threading')  # Cambié de 'gevent' a 'threading' para pruebas
+
+# Registrar las rutas de la aplicación después de la configuración
+import app_routes
 app_routes.register_routes(app)
 
 # Ejecución de la aplicación con soporte de SocketIO
 if __name__ == '__main__':
-    socketio.run(app)
+    socketio.run(app, host='0.0.0.0', port=5001, debug=True)  # Añadido puerto y debug para desarrollo
+
 

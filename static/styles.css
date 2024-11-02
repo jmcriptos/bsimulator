@@ -8,81 +8,123 @@ body {
     height: 100vh;
     margin: 0;
     color: #333;
+    flex-direction: column;
 }
 
-/* Contenedor del formulario */
-.container {
-    background-color: #ffffff;
-    border: 1px solid #cfcfcf;
+/* Contenedor del encabezado */
+.header {
+    margin-bottom: 10px;
+}
+
+/* Contenedor principal de la página del juego */
+.game-container {
+    display: flex;
+    justify-content: space-between;
+    max-width: 1400px;
+    width: 100%;
+    margin: 0 auto;
+    gap: 15px; /* Añadido para ajustar la separación entre secciones */
+}
+
+/* Sección de Chat */
+.chat-container {
+    flex: 0.8; /* Reducir tamaño del chat */
+    min-width: 220px;
+    max-width: 300px;
+    padding: 20px;
+    border: 2px solid #d0d0d0;
     border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    padding: 20px 40px;
-    max-width: 400px;
-    width: 100%;
+    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2);
+    background-color: #f0f0f0;
 }
 
-/* Título */
-h1 {
-    color: #0078d7;
-    font-size: 22px;
-    margin-bottom: 20px;
+/* Sección de Decisiones */
+.decision-form {
+    flex: 1; /* Mantener tamaño medio */
+    max-width: 350px;
+    padding: 20px;
+    border: 2px solid #d0d0d0;
+    border-radius: 5px;
+    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2);
+    background-color: #f0f0f0;
+}
+
+/* Sección de Resultados */
+.results-container {
+    flex: 1;
+    min-width: 280px;
+}
+
+/* Ajustes de los contenedores */
+#decisionForm,
+#results,
+#chatMessages {
+    padding: 20px;
+    border: 2px solid #d0d0d0;
+    border-radius: 5px;
+    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2);
+    background-color: #f0f0f0;
+}
+
+/* Ajuste de los títulos */
+h3 {
     text-align: center;
-}
-
-/* Etiquetas y campos de entrada */
-label {
-    font-weight: normal;
-    font-size: 14px;
     color: #333;
-    display: block;
-    margin-bottom: 5px;
+    font-size: 18px;
+    margin-bottom: 15px;
 }
 
-input[type="text"],
-select {
+/* Ajustes para formulario de decisiones */
+#decisionForm input,
+#decisionForm button {
+    margin-top: 10px;
     width: 100%;
     padding: 10px;
-    margin-bottom: 20px;
+    border-radius: 3px;
     border: 1px solid #d0d0d0;
-    border-radius: 3px;
-    font-size: 14px;
-    color: #333;
-    background-color: #f9f9f9;
 }
 
-input[type="text"]:focus,
-select:focus {
-    outline: none;
-    border-color: #0078d7;
-    box-shadow: 0 0 3px #0078d7;
-}
-
-/* Botón estilo Windows */
-.button {
-    display: block;
-    width: 100%;
-    padding: 10px;
-    font-size: 14px;
-    color: #ffffff;
+/* Estilo del botón de Enviar */
+#decisionForm button {
     background-color: #0078d7;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-    text-align: center;
+    color: white;
     font-weight: bold;
+    border: none;
+    cursor: pointer;
 }
 
-.button:hover {
+#decisionForm button:hover {
     background-color: #0063b1;
 }
 
-.button:active {
+#decisionForm button:active {
     background-color: #005499;
 }
 
-.footer {
-    margin-top: 20px;
-    text-align: center;
-    font-size: 12px;
-    color: #777;
+/* Ajustes del chat */
+#chatMessages {
+    height: 400px;
+    overflow-y: auto;
+    background-color: #f9f9f9;
+}
+
+/* Resultados del juego */
+#resultsOutput {
+    min-height: 400px;
+    white-space: pre-wrap;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 14px;
+    color: #0078d7;
+    background-color: #e6f0ff;
+    padding: 15px;
+    border-radius: 5px;
+    border: 1px solid #d0d0d0;
+}
+/* Estilo del botón de Enviar */
+#chat button {
+    background-color: #0078d7;
+    color: white;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
 }

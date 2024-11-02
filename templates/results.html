@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultados del Juego - Simulador de Negocios</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="header" style="text-align: center; margin-top: 20px;">
+        <h1 style="font-size: 28px;">Resultados del Simulador de Negocios</h1>
+    </div>
+
+    <!-- Sección de Resultados del Juego -->
+    <div class="results-container" style="max-width: 1200px; margin: 20px auto;">
+        <table id="resultsTable" style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background-color: #e6f0ff;">
+                    <th style="border: 1px solid #cfcfcf; padding: 10px;">Ronda</th>
+                    <th style="border: 1px solid #cfcfcf; padding: 10px;">Equipo</th>
+                    <th style="border: 1px solid #cfcfcf; padding: 10px;">Demanda</th>
+                    <th style="border: 1px solid #cfcfcf; padding: 10px;">Ganancia</th>
+                    <th style="border: 1px solid #cfcfcf; padding: 10px;">Efectivo</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for round, teams in results.items() %}
+                    {% for team, data in teams.items() %}
+                    <tr>
+                        <td style="border: 1px solid #cfcfcf; padding: 8px;">{{ round }}</td>
+                        <td style="border: 1px solid #cfcfcf; padding: 8px;">{{ team }}</td>
+                        <td style="border: 1px solid #cfcfcf; padding: 8px;">{{ data['Demand'] }}</td>
+                        <td style="border: 1px solid #cfcfcf; padding: 8px;">{{ data['Profit'] }}</td>
+                        <td style="border: 1px solid #cfcfcf; padding: 8px;">{{ data['Cash'] }}</td>
+                    </tr>
+                    {% endfor %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
+
