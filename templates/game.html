@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Negocios - Juego</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
+</head>
+<body>
+    <h1>Simulador de Negocios - Equipo {{ team }}</h1>
+    <p>ID de Usuario: {{ user_id }}</p>
+    
+    <!-- Sección de Decisiones -->
+    <div>
+        <h3>Enviar Decisiones</h3>
+        <form id="decisionForm">
+            <label>Precio:</label>
+            <input type="number" id="price" required><br>
+
+            <label>Marketing:</label>
+            <input type="number" id="marketing" required><br>
+
+            <label>Calidad (1-10):</label>
+            <input type="number" id="quality" min="1" max="10" required><br>
+
+            <label>Producción (unidades):</label>
+            <input type="number" id="production" required><br>
+
+            <label>Innovación:</label>
+            <input type="number" id="innovation" required><br>
+
+            <button type="submit">Enviar</button>
+        </form>
+    </div>
+
+    <!-- Sección de Resultados -->
+    <div id="results">
+        <h3>Resultados del Juego</h3>
+        <pre id="resultsOutput"></pre>
+    </div>
+
+    <!-- Scripts de Socket.IO y lógica de cliente -->
+    <script>
+        const socket = io();
+
+        // Enviar decisiones del usuario al servidor
+        document.getElementById('decisionForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const price = parseFloat(document.getElementById('price').value);
+            const marketing = parseFloat(document.getElementById('marketing').value);
+            const quality = parseInt(document.getElementById('quality').value);
+            const production = parseInt(document.getElementById('production').value);
+            const innovation = parseFloat(document.getElementById('innovation').value);
+
+            // Emitir el evento `send_decision` al servidor con los datos del usuario
+            socket.emit('send_decision', {
+                team: "{{ team }}",
+                price,
+                marketing,
+                quality,
+                production,
+                innovation
+            });
+        });
+
+        // Escuchar el evento `update_results` para recibir resultados actualizados
+        socket.on('update_results', function(results) {
+            const resultsOutput = document.getElementById('resultsOutput');
+            resultsOutput.innerText = JSON.stringify(results, null, 2);
+        });
+
+        // Notificación cuando otros usuarios se unen al equipo
+        socket.on('team_notification', function(data) {
+            alert(data.message);
+        });
+
+        // Unirse a la sala del equipo cuando la página se carga
+        socket.emit('join', { user_id: "{{ user_id }}", team: "{{ team }}" });
+    </script>
+</body>
+</html>
+

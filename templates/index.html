@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Business Simulator - Bienvenido</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h1>Bienvenido al Simulador de Negocios</h1>
+    <form method="POST" action="{{ url_for('index') }}">
+        {{ form.csrf_token }}
+        <label>{{ form.user_id.label }}</label>
+        {{ form.user_id }}
+        <br>
+        <label>{{ form.team.label }}</label>
+        {{ form.team }}
+        <br>
+        {{ form.submit }}
+    </form>
+
+    <div class="footer">
+        <p>BSimulator © 2024</p>
+    </div>
+
+</body>
+</html>
+
+
+
