@@ -58,7 +58,11 @@ def register_routes(app):
         return redirect(url_for('index'))
 
     @socketio.on('send_decision')
-    def handle_send_decision(data):
+    def handle_decision(data):
+        print('Decision received:', data)  # Añade este print para ver si la decisión es recibida
+        emit('decision_received', data, broadcast=True)
+        
+
         # Obtener el equipo al que pertenece el usuario desde los datos recibidos
         team = data.get('team')
         price = data.get('price', 0)
@@ -97,6 +101,9 @@ def register_routes(app):
             emit('display_results', {
                 'results': game_results,
             }, broadcast=True)
+            socketio.emit('show_results', room=team)
+
+
 
     @socketio.on('send_message')
     def handle_send_message(data):

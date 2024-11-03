@@ -40,7 +40,9 @@ document.addEventListener('DOMContentLoaded', function() {
         var quality = parseFloat(document.getElementById('quality').value);
         var production = parseFloat(document.getElementById('production').value);
         var innovation = parseFloat(document.getElementById('innovation').value);
-
+    
+        console.log('Preparando para enviar decisión:', { price, marketing, quality, production, innovation });
+    
         if (!isNaN(price) && !isNaN(marketing) && !isNaN(quality) && !isNaN(production) && !isNaN(innovation)) {
             socket.emit('send_decision', {
                 team: team,
@@ -50,17 +52,24 @@ document.addEventListener('DOMContentLoaded', function() {
                 production: production,
                 innovation: innovation
             });
-            console.log('Sending decision:', { price, marketing, quality, production, innovation });
+            console.log('Decisión enviada:', { team, price, marketing, quality, production, innovation });
         } else {
+            console.error('Error: Campos no válidos.');
             alert('Por favor, complete todos los campos con valores numéricos antes de enviar la decisión.');
         }
     }
 
+    socket.on('show_results', function() {
+        window.location.href = '/results';
+    });
+    
+
     // Recibir confirmación de envío de decisiones
     socket.on('decision_received', function(data) {
         console.log('Decisión recibida por el servidor:', data);
-        alert('Decisión recibida por el servidor: ' + JSON.stringify(data));
+        window.location.href = '/results';  // Redirigir a resultados
     });
+    
 
     // Foco automático en el campo del mensaje después de enviar
     document.getElementById('chatMessage').focus();
