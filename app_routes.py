@@ -153,8 +153,8 @@ def handle_reset_game():
     global decisiones, game_results, teams_ready, teams
     decisiones = {}
     game_results = {
-        "Equipo A": {"Demand": 0, "Profit": 0, "Cash": 50000, "Inventory": 0},
-        "Equipo B": {"Demand": 0, "Profit": 0, "Cash": 50000, "Inventory": 0}
+        "Equipo A": {"Demand": 0, "Profit": 0, "Cash": 50000, "Inventory": 20000},
+        "Equipo B": {"Demand": 0, "Profit": 0, "Cash": 50000, "Inventory": 20000}
     }
     teams_ready = {
         "Equipo A": False,
@@ -183,19 +183,42 @@ def calcular_resultados(decisiones):
         resultados[ronda] = {}
 
         for equipo, decision in equipos.items():
-            # Calcula la demanda (un ejemplo simple basado en el precio y marketing)
-            demanda = max(0, 10000 - decision['price'] * 100 + decision['marketing'] * 2 + decision['quality'] * 50)
+            # Inventario disponible al inicio de la ronda
+            inventario_inicial = game_results[equipo]['Inventory']
+            produccion = decision['production']
+            inventario_disponible = inventario_inicial + produccion
 
-            # Calcula la ganancia como el producto de la demanda y el precio, menos los costos
-            ingresos = demanda * decision['price']
-            costo_ventas = demanda * decision['price'] * 0.50
-            costos = costo_ventas + decision['marketing'] + decision['innovation']
-            ganancia = ingresos - costos
+            # Calcula la demanda (un ejemplo simple basado en el precio, marketing y ahora innovación)
+            demanda = max(0, 10000 - decision['price'] * 100 + decision['marketing'] * 2 + decision['quality'] * 50 + decision['innovation'] * 10)
 
-            # Actualizar inventario
-            inventario = max(0, decision['production'] - demanda)
+            # Ajustar la demanda para que no exceda el inventario disponible
+            ventas_reales = min(demanda, inventario_disponible)
 
-            # Calcula el efectivo restante
+            # Calcula los ingresos como el producto de las ventas reales y el precio
+            ingresos = ventas_reales * decision['price']
+
+            # Costo de ventas (considerando el costo del 50% del precio para las unidades vendidas)
+            costo_ventas = ventas_reales * decision['price'] * 0.50
+
+            # Costos de marketing e innovación
+            costos_marketing_innovacion = decision['marketing'] + decision['innovation']
+
+            # Calcular variación del inventario
+            variacion_inventario = inventario_disponible - ventas_reales
+
+            # Si el inventario aumentó, debemos considerar el costo de almacenamiento (supongamos que es un 10% del valor de producción)
+            # Si el inventario disminuyó, se considera que ya está cubierto por el costo de producción
+            costo_inventario = 0
+            if variacion_inventario > inventario_inicial:
+                costo_inventario = (variacion_inventario - inventario_inicial) * decision['price'] * 0.10
+
+            # Calcula la ganancia: ingresos menos los costos
+            ganancia = ingresos - costo_ventas - costos_marketing_innovacion - costo_inventario
+
+            # Actualizar inventario (restar las ventas reales de lo disponible)
+            inventario = inventario_disponible - ventas_reales
+
+            # Calcula el efectivo restante considerando la ganancia y los costos de marketing, innovación e inventario
             efectivo_restante = game_results[equipo]['Cash'] + ganancia
 
             # Almacena los resultados
@@ -214,6 +237,9 @@ def calcular_resultados(decisiones):
             game_results[equipo]['Inventory'] = inventario
 
     return resultados
+
+
+
 
 
 @socketio.on('send_message')

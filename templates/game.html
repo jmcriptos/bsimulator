@@ -8,6 +8,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
 </head>
 <body>
+    <!-- Botón para reiniciar el juego -->
+    <div style="position: absolute; top: 20px; left: 20px;">
+        <button onclick="resetGame()" style="background-color: #d9534f; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; font-size: 14px;">Reiniciar Juego</button>
+    </div>
+
     <div class="header" style="text-align: center; margin-top: 20px;">
         <h1 style="font-size: 28px;">BSimulator - {{ team }}</h1>
         <p>Usuario: {{ user_id }} | {{ team }} | Ronda Actual: {{ ronda_actual }}</p>
@@ -62,10 +67,6 @@
         </div>
     </div>
 
-    <div style="text-align: center; margin-top: 40px;">
-        <button onclick="resetGame()" style="background-color: #d9534f; color: white; border: none; padding: 15px; border-radius: 5px; cursor: pointer; font-size: 16px;">Reiniciar Juego</button>
-    </div>
-
     <script>
         var socket = io();
         socket.emit('join', { user_id: '{{ user_id }}', team: '{{ team }}' });
@@ -116,6 +117,9 @@
                     production: production,
                     innovation: innovation
                 });
+
+                // Mostrar un mensaje de confirmación al usuario
+                alert('Las decisiones han sido enviadas correctamente. Serás redirigido a los resultados una vez que ambos equipos hayan enviado sus decisiones.');
             } else {
                 console.error('Por favor, complete todos los campos antes de enviar la decisión.');
                 alert('Por favor, complete todos los campos antes de enviar la decisión.');
@@ -127,25 +131,27 @@
             console.log('Decisión recibida por el servidor:', data);
         });
 
-        // Escuchar el evento 'show_results' para redirigir a /results
+        // Redirigir a resultados cuando ambos equipos hayan enviado sus decisiones
         socket.on('show_results', function() {
             window.location.href = '/results';
         });
 
         // Reiniciar el juego
-        function resetGame() {
-            if (confirm("¿Estás seguro de que deseas reiniciar el juego? Esta acción no se puede deshacer.")) {
-                socket.emit('reset_game');
-            }
-        }
-
         // Socket para manejar el evento de reinicio del juego
         socket.on('game_reset', function() {
             window.location.href = '/';
         });
+
+    function resetGame() {
+        if (confirm("¿Estás seguro de que deseas reiniciar el juego? Esta acción no se puede deshacer.")) {
+            socket.emit('reset_game');
+        }
+    }
     </script>
 </body>
 </html>
+
+
 
 
 

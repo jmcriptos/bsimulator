@@ -63,15 +63,11 @@
             console.log('Redirigiendo al juego para una nueva ronda');
             window.location.href = '/game';
         });
-
-        // Escuchar confirmación de inicio de nueva ronda
-        socket.on('round_started', function() {
-            console.log('Nueva ronda iniciada, redirigiendo a la página del juego');
-            window.location.href = '/game';
-        });
     </script>
 </body>
 </html>
+
+
 
 
 
