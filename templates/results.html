@@ -3,41 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resultados del Juego - Simulador de Negocios</title>
+    <title>Resultados del Simulador de Negocios</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
 </head>
 <body>
     <div class="header" style="text-align: center; margin-top: 20px;">
         <h1 style="font-size: 28px;">Resultados del Simulador de Negocios</h1>
     </div>
 
-    <!-- Sección de Resultados del Juego -->
-    <div class="results-container" style="max-width: 1200px; margin: 20px auto;">
-        <table id="resultsTable" style="width: 100%; border-collapse: collapse;">
+    <div class="results-container" style="text-align: center; margin-top: 40px;">
+        <table style="margin: 0 auto; border-collapse: collapse; width: 90%;">
             <thead>
-                <tr style="background-color: #e6f0ff;">
-                    <th style="border: 1px solid #cfcfcf; padding: 10px;">Ronda</th>
-                    <th style="border: 1px solid #cfcfcf; padding: 10px;">Equipo</th>
-                    <th style="border: 1px solid #cfcfcf; padding: 10px;">Demanda</th>
-                    <th style="border: 1px solid #cfcfcf; padding: 10px;">Ganancia</th>
-                    <th style="border: 1px solid #cfcfcf; padding: 10px;">Efectivo</th>
+                <tr style="background-color: #f2f2f2;">
+                    <th style="padding: 10px; border: 1px solid #ddd; white-space: nowrap;">Ronda</th>
+                    <th style="padding: 10px; border: 1px solid #ddd; white-space: nowrap;">Equipo</th>
+                    <th style="padding: 10px; border: 1px solid #ddd; white-space: nowrap;">Demanda</th>
+                    <th style="padding: 10px; border: 1px solid #ddd; white-space: nowrap;">Ganancia</th>
+                    <th style="padding: 10px; border: 1px solid #ddd; white-space: nowrap;">Efectivo</th>
+                    <th style="padding: 10px; border: 1px solid #ddd; white-space: nowrap;">Inventario</th>
+                    <th style="padding: 10px; border: 1px solid #ddd; white-space: nowrap;">Decisiones</th>
                 </tr>
             </thead>
             <tbody>
-                {% for round, teams in results.items() %}
-                    {% for team, data in teams.items() %}
-                    <tr>
-                        <td style="border: 1px solid #cfcfcf; padding: 8px;">{{ round }}</td>
-                        <td style="border: 1px solid #cfcfcf; padding: 8px;">{{ team }}</td>
-                        <td style="border: 1px solid #cfcfcf; padding: 8px;">{{ data['Demand'] }}</td>
-                        <td style="border: 1px solid #cfcfcf; padding: 8px;">{{ data['Profit'] }}</td>
-                        <td style="border: 1px solid #cfcfcf; padding: 8px;">{{ data['Cash'] }}</td>
-                    </tr>
-                    {% endfor %}
+                {% for ronda, equipo_data in resultados.items() %}
+                <tr>
+                    <td style="padding: 10px; border: 1px solid #ddd; white-space: nowrap;" rowspan="{{ equipo_data|length }}">{{ ronda }}</td>
+                    {% for equipo, datos in equipo_data.items() %}
+                    <td style="padding: 10px; border: 1px solid #ddd; white-space: nowrap;">{{ equipo }}</td>
+                    <td style="padding: 10px; border: 1px solid #ddd; white-space: nowrap;">{{ datos.get('Demand', '-') }}</td>
+                    <td style="padding: 10px; border: 1px solid #ddd; white-space: nowrap;">{{ datos.get('Profit', '-') }}</td>
+                    <td style="padding: 10px; border: 1px solid #ddd; white-space: nowrap;">{{ datos.get('Cash', '-') }}</td>
+                    <td style="padding: 10px; border: 1px solid #ddd; white-space: nowrap;">{{ datos.get('Inventory', '-') }}</td>
+                    <td style="padding: 10px; border: 1px solid #ddd; white-space: nowrap;">
+                        Precio: {{ datos['Decisions']['price'] }}, Marketing: {{ datos['Decisions']['marketing'] }}, Calidad: {{ datos['Decisions']['quality'] }}, Producción: {{ datos['Decisions']['production'] }}, Innovación: {{ datos['Decisions']['innovation'] }}
+                    </td>
+                </tr>
+                {% endfor %}
                 {% endfor %}
             </tbody>
         </table>
+
+        <div style="margin-top: 40px;">
+            <button onclick="startNewRound()" style="background-color: #0078d7; color: white; border: none; padding: 15px; border-radius: 5px; cursor: pointer; font-size: 16px;">Iniciar Nueva Ronda</button>
+        </div>
     </div>
+
+    <script>
+        var socket = io();
+
+        // Iniciar una nueva ronda
+        function startNewRound() {
+            console.log('Iniciando nueva ronda');
+            socket.emit('start_new_round');
+        }
+
+        // Escuchar para redirigir de vuelta al juego cuando se inicie una nueva ronda
+        socket.on('new_round_started', function() {
+            console.log('Redirigiendo al juego para una nueva ronda');
+            window.location.href = '/game';
+        });
+
+        // Escuchar confirmación de inicio de nueva ronda
+        socket.on('round_started', function() {
+            console.log('Nueva ronda iniciada, redirigiendo a la página del juego');
+            window.location.href = '/game';
+        });
+    </script>
 </body>
 </html>
+
+
+
+
+
+
+
 

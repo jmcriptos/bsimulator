@@ -60,8 +60,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     socket.on('show_results', function() {
+        console.log("Evento 'show_results' recibido, redirigiendo a /results");
         window.location.href = '/results';
     });
+    
+    
+    
     
 
     // Recibir confirmación de envío de decisiones

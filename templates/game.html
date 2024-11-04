@@ -10,7 +10,7 @@
 <body>
     <div class="header" style="text-align: center; margin-top: 20px;">
         <h1 style="font-size: 28px;">BSimulator - {{ team }}</h1>
-        <p>Usuario: {{ user_id }} | {{ team }}</p>
+        <p>Usuario: {{ user_id }} | {{ team }} | Ronda Actual: {{ ronda_actual }}</p>
     </div>
 
     <!-- Contenedor General del Juego -->
@@ -60,6 +60,10 @@
                 </div>
             </form>
         </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 40px;">
+        <button onclick="resetGame()" style="background-color: #d9534f; color: white; border: none; padding: 15px; border-radius: 5px; cursor: pointer; font-size: 16px;">Reiniciar Juego</button>
     </div>
 
     <script>
@@ -122,9 +126,28 @@
         socket.on('decision_received', function(data) {
             console.log('Decisión recibida por el servidor:', data);
         });
+
+        // Escuchar el evento 'show_results' para redirigir a /results
+        socket.on('show_results', function() {
+            window.location.href = '/results';
+        });
+
+        // Reiniciar el juego
+        function resetGame() {
+            if (confirm("¿Estás seguro de que deseas reiniciar el juego? Esta acción no se puede deshacer.")) {
+                socket.emit('reset_game');
+            }
+        }
+
+        // Socket para manejar el evento de reinicio del juego
+        socket.on('game_reset', function() {
+            window.location.href = '/';
+        });
     </script>
 </body>
 </html>
+
+
 
 
 
